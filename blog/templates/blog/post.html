@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}{{ post.title }}{% endblock %}
 {% block content %}
     <div id="title_post" style="background-image: url({{ post.image.url }})">
         <div id="title">
@@ -10,13 +11,21 @@
         <div class="left">
             <h4>{{ post.title }}</h4>
             <div class="body_post">
-                {{ post.body }}
+                <p>{{ post.body }}</p>
             </div>
-            {% if  post.additional_photo_first %}
-                <div class="image_post">
-                    <img src="{{ post.additional_photo_first.url }}" alt="">
-                </div>
-            {% endif %}
+            <div class="gallery-post">
+                {% if  post.additional_photo_first %}
+                    <div class="image_post">
+                        <div class="image_p">
+                            <img src="{{ post.additional_photo_first.url }}" alt="">
+                        </div>
+                        <div class="image_p">
+                            <img src="{{ post.additional_photo_second.url }}" alt="">
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
         </div>
         <div class="right">
             <h4>Partnerzy:</h4>
@@ -31,5 +40,7 @@
             </div>
         </div>
     </div>
-
+<div class="footer">
+    <a href="https://www.linkedin.com/in/sebastian-jadczak-b74a40182">&copy; Sebastian Jadczak</a>
+</div>
 {% endblock %}

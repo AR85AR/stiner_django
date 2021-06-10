@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <link rel="stylesheet" href="{% static "css/style_map.css" %}">
     <link rel="stylesheet" href="{% static "css/style_done.css" %}">
+    <title>Zwiedzone</title>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
 
@@ -60,8 +62,7 @@
             <button class="user_menu"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
             <div class="user_menu">
                 <ul>
-                    {#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                    <li><a href="{% url 'account:user_settings' %}">Ustawienia</a></li>
+                 <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                     {% if perms.blog.view_post %}
                         <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -73,7 +74,7 @@
                 </ul>
             </div>
         {% else %}
-            <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+            <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
             <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>

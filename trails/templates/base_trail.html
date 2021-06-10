@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{% static 'css/style_trail_add.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_interesting_points.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_trails_search.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <script data-ad-client="ca-pub-5722846627217105" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
@@ -57,8 +58,7 @@
         <button class="user_menu" style="cursor: pointer"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
         <div class="user_menu">
             <ul>
-{#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                <li><a href="#">Ustawienia</a></li>
+                <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                 {% if perms.blog.view_post%}
                     <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -70,7 +70,7 @@
             </ul>
         </div>
         {% else %}
-        <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+        <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
         <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>

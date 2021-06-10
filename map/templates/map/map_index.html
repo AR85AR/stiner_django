@@ -14,6 +14,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
+        <title>Strona główna</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.5.1/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
@@ -68,6 +69,7 @@
     <link rel="stylesheet" href="{% static 'css/style_order.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_order_created.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_blog_post.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
 
@@ -105,8 +107,7 @@
         <button class="user_menu"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
         <div class="user_menu">
             <ul>
-{#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                <li><a href="{% url 'account:user_settings' %}">Ustawienia</a></li>
+                <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                 {% if perms.blog.view_post%}
                     <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -118,7 +119,7 @@
             </ul>
         </div>
         {% else %}
-        <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+        <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
         <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>

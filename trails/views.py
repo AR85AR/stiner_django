@@ -69,13 +69,17 @@ def point_render_pdf_view(request, pk):
 def trail_render_pdf_view(request, pk):
     template_path = 'trailsPDF.html'
     trail = Trail.objects.filter(id=pk).first()
-    context = {'trail': trail}
+    trail.downloads += 1
+    trail.save()
+    points = list(list(Trail.objects.filter(id=pk))[0].points.all())
+    last_point =points[(len(points) - 1)]
+    context = {'trail': trail, 'points':points, 'first_point':points[0],'last_point': last_point}
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="trail.pdf"'
     template = get_template(template_path)
     html = template.render(context)
     pisa_status = pisa.CreatePDF(
-        html, dest=response, encoding='UTF-8')
+        html, dest=response, encoding='UTF-8', link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
@@ -293,8 +297,6 @@ class TrailsListView(ListView, MethodTrail):
     template_name = 'trails/all_trails/all_trails.html'
     model = Trail
 
-
-
     def get_context_data(self, **kwargs):
         context = super(TrailsListView, self).get_context_data(**kwargs)
         context['city'] = self.get_city()
@@ -327,7 +329,11 @@ class TrailDetailView(DetailView):
     template_name = 'trails/all_trails/trail/trail_detail.html'
     model = Trail
 
-
+    def audioCount(request, pk):
+        trail = get_object_or_404(Trail, id=pk)
+        trail.auditions += 1
+        trail.save()
+        return HttpResponseRedirect(reverse('trails:trail_detail', args=[str(pk)]))
 
     def calculation_mean(self, trail_name):
         rate_trail = list(Rate_trail.objects.filter(trail=trail_name))
@@ -361,7 +367,6 @@ class TrailDetailView(DetailView):
 
     def trail_done(request, pk):
         trail = get_object_or_404(Trail, id=request.POST.get('done_trail'))
-        trail_dones = False
         if trail.done.filter(id=request.user.id).exists():
             trail.done.remove(request.user)
             trail.done_count -= 1
@@ -374,13 +379,10 @@ class TrailDetailView(DetailView):
 
     def trail_heart(request, pk):
         trail = get_object_or_404(Trail, id=request.POST.get('heart_trail'))
-        trail_liked = False
         if trail.heart.filter(id=request.user.id).exists():
             trail.heart.remove(request.user)
-            trail_liked = False
         else:
             trail.heart.add(request.user)
-            trail_liked = True
         return HttpResponseRedirect(reverse('trails:trail_detail', args=[str(pk)]))
 
     def get_top_rate_trails(self):

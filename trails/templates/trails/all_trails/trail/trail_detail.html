@@ -37,11 +37,12 @@
     <link rel="stylesheet" href="{% static 'css/style_all_trails.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_your_trails.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_trail_detail.css' %}">
-
+    <title>{{ trail.name }}</title>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
 <div id="top">
-    <div class="logo"><img src="{% static "img/logo.png" %}" alt="logo"></div>
+    <div class="logo"><a href="{% url 'map' %}"><img src="{% static "img/logo.png" %}" alt="logo"></a></div>
     <div class="menu">
         <ul>
             <li class="red top_menu"><a href="{% url  'mapFullScreen'%}" ></i>Mapa</a></li>
@@ -73,8 +74,7 @@
         <button class="user_menu"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
         <div class="user_menu">
             <ul>
-{#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                <li><a href="#">Ustawienia</a></li>
+                <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                 {% if perms.blog.view_post%}
                     <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -86,7 +86,7 @@
             </ul>
         </div>
         {% else %}
-        <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+        <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
         <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>
@@ -98,8 +98,10 @@
             <h3>{{trail.name}}</h3>
         </div>
         <div id="file-trail">
-            <button id="pdf"><a href="{% url 'trails:pdf_trail' trail.id %}"><i class="fas fa-cloud-download-alt"></i> Pobierz przewodnik w wersji PDF</a></button>
-            <button id="audio"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio</button>
+            <button id="pdf"><a href="{% url 'trails:pdf_trail' trail.id %}"><i class="fas fa-cloud-download-alt"></i>
+                Pobierz przewodnik w wersji PDF</a></button>
+            <button id="audio" onclick="openAudioTrail()"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio
+            </button>
         </div>
     </div>
 <div class="center">
@@ -126,8 +128,8 @@
                 <div class="icons">
                     <p id="done"><i class="fas fa-eye"></i> <span>{{ trail.done.all.count }} x wykonano</span>|</p>
                     <p id="heart"><i class="fas fa-heart"></i><span>{{ trail.heart.all.count }} x W ulubionych</span>|</p>
-                    <p id="downloads"><i class="fas fa-file-download"></i><span>{{ trail.downloads|length }} x pobrań</span>|</p>
-                    <p id="sound"><i class="fas fa-volume-up"></i><span>{{ trail.sound|length }} x odsłuchań</span>|</p>
+                    <p id="downloads"><i class="fas fa-file-download"></i><span>{{ trail.downloads }} x pobrań</span>|</p>
+                    <p id="sound"><i class="fas fa-volume-up"></i><span>{{ trail.auditions }} x odsłuchań</span>|</p>
                 </div>
             </div>
             <div class="more-trail">
@@ -174,13 +176,16 @@
                     <div class="image-trail"><img src="{{ p.image.url }}" alt=""></div>
                         <div class="point_in_trail" id="{{ p.id }}">
                             <div class="title_point"><h3>{{ p.name }}</h3></div>
-                            <div class="description_point"><p>{{ p.descriptions }}</p></div>
+                            <div class="description_point"><p>{{ p.descriptions }}</p>
+                                <p id="source">Źródło: {{ p.source }}</p>
+                            </div>
 
                         </div>
                     </li>
                 {% endfor %}
             </ul>
         </div>
+
         <div class="opinion-trail">
                        <h3>Oceny i opinie</h3>
                         <p>
@@ -265,6 +270,21 @@
         <div id="li"><a href="https://www.linkedin.com/company/stiner/"><i class="fab fa-linkedin"></i></a></div>
         <div id="youtube"><i class="fab fa-youtube"></i></div>
     </div>
+    <div id="audioTrail">
+        <div class="audioTrail">
+            <h3>{{ trail.name }} <span id="closeAudioTrail"><i class="fas fa-times"></i></span></h3>
+            {% for p in points %}
+                <div class="pointAudio">
+                    <p id="audioName">{{ p.name }}:</p>
+                    {% if p.sound %}
+                        <audio src="{{ p.sound.url }}" controls controlsList="nodownload"></audio>
+                    {% else %}
+                        <p>Brak pliku audio</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 <<<<<<< HEAD
@@ -281,6 +301,29 @@
 ></script>
 
 <script>
+    function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+let add = document.getElementById('add')
+let len_trail = document.getElementById('len_trail')
+function addAudioCount(){
+    $.post({
+            url: "audioCount/",
+            headers: {
+                'csrfmiddlewaretoken': csrftoken
+            }
+        })
+
+}
     let login_rwd = document.getElementById('login_rwd')
 <<<<<<< HEAD
 let menuDetail = document.getElementById('menu-detail-trail')
@@ -298,6 +341,18 @@ function menuDetailTrail() {
 =======
     let menuDetail = document.getElementById('menu-detail-trail')
     let login_mapa_menu = document.querySelector('.login_mapa')
+    let audioTrail = document.getElementById('audioTrail')
+    let closeAudioTrail = document.getElementById('closeAudioTrail')
+    {#Audio#}
+     function openAudioTrail(){
+        audioTrail.style.display = 'block'
+         addAudioCount()
+    }
+    if(closeAudioTrail){
+        closeAudioTrail.addEventListener('click',function (){
+            audioTrail.style.display = 'none'
+        })
+    }
     //------------------------------------------
     //The method responsible for choosing login / registration at low screen resolution
     if (login_rwd) {

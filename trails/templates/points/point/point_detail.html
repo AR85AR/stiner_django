@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.5.1/dist/leaflet.css"/>
-    <title>{% block title %} {% endblock %}</title>
+    <title>{{ point.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -35,8 +35,7 @@
     <link rel="stylesheet" href="{% static 'css/style_save_draft_trail.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_trail_add.css' %}">
     <link rel="stylesheet" href="{% static 'css/style_interesting_points.css' %}">
-    <script data-ad-client="ca-pub-5722846627217105" async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <style>
         #map_1de6ef4f1218487da9d6da057bb8f454 {
             position: relative;
@@ -79,7 +78,7 @@
 </head>
 <body>
 <div id="top">
-    <div class="logo"><img src="{% static 'img/logo.png' %}" alt="logo"></div>
+    <div class="logo"><a href="{% url 'map' %}"><img src="{% static "img/logo.png" %}" alt="logo"></a></div>
     <div class="menu">
         <ul>
             <li class="red top_menu"><a href="{% url  'mapFullScreen'%}" ></i>Mapa</a></li>
@@ -111,8 +110,7 @@
         <button class="user_menu" style="cursor: pointer"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
         <div class="user_menu">
             <ul>
-{#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                <li><a href="#">Ustawienia</a></li>
+                <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                 {% if perms.blog.view_post%}
                 <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -124,7 +122,7 @@
             </ul>
         </div>
         {% else %}
-        <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+        <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
         <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>
@@ -137,7 +135,11 @@
     <div id="file-point">
         {% if user.is_authenticated %}
             <button id="pdf" ><a href="{% url 'trails:pdf_point' point.id %}"> <i class="fas fa-cloud-download-alt"></i> Pobierz przewodnik w wersji PDF</a></button>
-            <button id="audio"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio</button>
+            {% if point.sound %}
+                <button id="audio" onclick="openAudio()"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio</button>
+            {% else %}
+                <button id="audio-none"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio</button>
+            {% endif %}
         {% else %}
             <button id="pdf" ><a href="{% url 'login' %}"> <i class="fas fa-cloud-download-alt"></i> Pobierz przewodnik w wersji PDF</a></button>
             <button id="audio"><a href="{% url 'login' %}"><i class="fas fa-volume-up"></i> Odsłuchaj w formie Audio</a></button>
@@ -184,7 +186,7 @@
                         <i class="fas fa-user-friends"></i> <p><span>Dla kogo: </span><i>{{ point.for_whom }}</i></p>
                     </div>
                     <div id="city">
-                        <i class="fas fa-city"></i> <p><span>Miasto: </span><i>{{ point.city }}</i></p>
+                        <i class="fas fa-city"></i> <p><span>Miasto: </span><i>{{ point.location }}</i></p>
                     </div>
                 </div>
                 <div class="right">
@@ -316,10 +318,27 @@
     <div id="li"><a href="https://www.linkedin.com/company/stiner/"><i class="fab fa-linkedin"></i></a></div>
     <div id="youtube"><i class="fab fa-youtube"></i></div>
 </div>
+<div id="audio-wrap">
+    <div class="play">
 
+        <h3>{{ point.name }}<span id="close"><i class="fas fa-times"></i></span></h3>
+        {% if point.sound %}
+            <audio src="{{ point.sound.url }}"  controls controlsList="nodownload"></audio>
+        {% endif %}
+
+    </div>
+</div>
 <script>
-
-
+let audio = document.getElementById('audio-wrap')
+let close = document.getElementById('close')
+if(close){
+    close.addEventListener('click', function (){
+        audio.style.display = 'none'
+    })
+}
+function openAudio(){
+    audio.style.display = 'block'
+}
 function imageGallery() {
   const big = document.querySelector(".big");
   const small = document.querySelectorAll("#small img");

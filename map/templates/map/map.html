@@ -13,6 +13,8 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <title>Mapa</title>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.5.1/dist/leaflet.css"/>
@@ -62,6 +64,11 @@
                 background: #00000061;
                 z-index: 999;
                 }
+                 @media only screen and (max-height: 632px){
+                     #map_1de6ef4f1218487da9d6da057bb8f454 {
+                         height: 700px;
+                     }
+                 }
             </style>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -109,8 +116,7 @@
         <button class="user_menu"><i class="fas fa-user"></i><i class="fas fa-angle-down"></i></button>
         <div class="user_menu">
             <ul>
-{#                <li><a href="{% url 'account:user_account' %}">Moje konto</a></li>#}
-                <li><a href="{% url 'account:user_settings' %}">Ustawienia</a></li>
+                <li><a href="{% url 'account:password_reset' %}">Ustawienia</a></li>
 
                 {% if perms.blog.view_post%}
                     <li><a href="{% url 'management:blog_manage_post_list' %}">Panel administracyjny</a></li>
@@ -122,7 +128,7 @@
             </ul>
         </div>
         {% else %}
-        <button><a href="{% url 'login' %}">Zaloguj się</a></button>
+        <button class="log"><a href="{% url 'login' %}">Zaloguj się</a></button>
         <button class="register"><a href="{% url 'register' %}">Załóż konto</a></button>
         {% endif %}
     </div>
@@ -147,16 +153,26 @@
     </section>
 </div>
 <div id="filter">
-    <div id="search-filter"><i class="fas fa-search"></i><p>Wyszukaj</p></div>
+    <div id="x_hamburger_map"><i class="fas fa-times"></i></div>
+    <div id="search-filter"><i class="fas fa-search"></i>
+        <p>Wyszukaj</p></div>
     <div class="icons">
-        <div class="castle_mapa"><input type="checkbox" class="monuments" id="Zamki"><p>Zamki</p></div>
-        <div class="church_mapa"><input type="checkbox" class="monuments" id="Kościoły"><p>Kościoły</p></div>
-        <div class="tree_mapa"><input type="checkbox" class="monuments" id="Parki"><p>Parki</p></div>
-        <div class="monument_mapa"><input type="checkbox" class="monuments" id="Muzea"><p>Muzea</p></div>
-        <div class="culture_mapa"><input type="checkbox" class="monuments" id="Budowle"><p>Budowle</p></div>
-        <div class="hotel_mapa"><input type="checkbox" class="monuments" id="Hotele"><p>Hotele</p></div>
-        <div class="ogrody_mapa"><input type="checkbox" class="monuments" id="Ogrody"><p>Ogrody</p></div>
-        <div class="memorial_mapa"><input type="checkbox" class="monuments" id="Pomniki"><p>Pomniki</p></div>
+        <div class="castle_mapa"><input type="checkbox" class="monuments" id="Zamki">
+            <p>Zamki</p></div>
+        <div class="church_mapa"><input type="checkbox" class="monuments" id="Kościoły">
+            <p>Kościoły</p></div>
+        <div class="tree_mapa"><input type="checkbox" class="monuments" id="Parki">
+            <p>Parki</p></div>
+        <div class="monument_mapa"><input type="checkbox" class="monuments" id="Muzea">
+            <p>Muzea</p></div>
+        <div class="culture_mapa"><input type="checkbox" class="monuments" id="Budowle">
+            <p>Budowle</p></div>
+        <div class="hotel_mapa"><input type="checkbox" class="monuments" id="Hotele">
+            <p>Hotele</p></div>
+        <div class="ogrody_mapa"><input type="checkbox" class="monuments" id="Ogrody">
+            <p>Ogrody</p></div>
+        <div class="memorial_mapa"><input type="checkbox" class="monuments" id="Pomniki">
+            <p>Pomniki</p></div>
 
         <div class="memorial_mapa"><input type="checkbox" class="monuments" id="Rynki"><p>Rynki</p></div>
         <div class="memorial_mapa"><input type="checkbox" class="monuments" id="Mosty"><p>Mosty</p></div>
@@ -169,7 +185,9 @@
     <div class="search_mapa"><button onclick="post_monuments()">Szukaj</button></div>
 
 </div>
-
+<div id="hamburger-filter">
+    <i class="fas fa-bars"></i>
+</div>
 <div class="folium-map" id="map_1de6ef4f1218487da9d6da057bb8f454" ></div>
 
 
@@ -189,3 +207,22 @@
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com">
+<script>
+    let hamburger_filter = document.getElementById('hamburger-filter')
+    let filter = document.getElementById('filter')
+    let x_hamburger_map = document.getElementById('x_hamburger_map')
+    if (hamburger_filter) {
+        hamburger_filter.addEventListener('click', function () {
+            filter.style.display = 'block'
+            hamburger_filter.style.display = 'none'
+            x_hamburger_map.style.display = 'block'
+        })
+    }
+    if (x_hamburger_map) {
+        x_hamburger_map.addEventListener('click', function () {
+            filter.style.display = 'none'
+            hamburger_filter.style.display = 'block'
+            x_hamburger_map.style.display = 'none'
+        })
+    }
+</script>
